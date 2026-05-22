@@ -1,5 +1,9 @@
 # Low-Profile-Fingerprint
 
+<p align="center">
+  <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
+</p>
+
 Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva.
 
 ## Visão geral
