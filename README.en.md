@@ -86,7 +86,17 @@ Manual steps:
 3. Compare browser behavior with and without the script enabled.
 4. Check for differences in canvas, WebGL, timezone, and other exposed signals.
 
-Example: in a BrowserLeaks Canvas test, the page reported a canvas signature of `46CB33F5471311B5329087A2E5FCE3A2` with 100% uniqueness in its database.
+### Before
+
+<p align="center">
+  <img src="assets/browserleaks-before.png" alt="BrowserLeaks Canvas result before using Low-Profile-Fingerprint" width="700">
+</p>
+
+### After
+
+<p align="center">
+  <img src="assets/browserleaks-after.png" alt="BrowserLeaks Canvas result after using Low-Profile-Fingerprint" width="700">
+</p>
 
 ## Suggested metadata
 
