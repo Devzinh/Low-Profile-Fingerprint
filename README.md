@@ -19,6 +19,8 @@ Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve 
 - [Recursos](#recursos)
 - [Instalação](#instalação)
 - [Teste rápido](#teste-rápido)
+- [Canvas — Antes e Depois](#canvas--antes-e-depois)
+- [Metadata sugerido](#metadata-sugerido)
 - [Limitações](#limitações)
 - [Casos de uso](#casos-de-uso)
 - [Contribuição](#contribuição)
@@ -28,7 +30,7 @@ Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve 
 
 ## Visão geral
 
-**Low-Profile-Fingerprint** é um userscript focado em privacidade que tenta dificultar técnicas comuns de browser fingerprinting sem depender de bloqueio bruto ou quebra agressiva de APIs. Em vez de “apagar” a identidade do navegador, o script reduz sinais muito específicos e adiciona pequenas variações plausíveis por sessão.
+**Low-Profile-Fingerprint** é um userscript focado em privacidade que tenta dificultar técnicas comuns de browser fingerprinting sem depender de bloqueio bruto ou quebra agressiva de APIs. Em vez de "apagar" a identidade do navegador, o script reduz sinais muito específicos e adiciona pequenas variações plausíveis por sessão.
 
 A proposta é simples: fazer o navegador parecer menos único para sistemas que tentam identificar usuários por características como tela, timezone, canvas, WebGL, fontes, plugins, bateria e conexão.
 
@@ -52,9 +54,9 @@ Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização
 
 ## Analogia
 
-Imagine que entrar em um site é como entrar em um shopping onde um segurança tenta reconhecer cada visitante pela roupa, pelo jeito de andar, pelo relógio e pelos detalhes do tênis. Browser fingerprinting faz algo parecido: em vez de pedir seu nome, ele observa características técnicas do navegador para decidir se “já viu você antes”.
+Imagine que entrar em um site é como entrar em um shopping onde um segurança tenta reconhecer cada visitante pela roupa, pelo jeito de andar, pelo relógio e pelos detalhes do tênis. Browser fingerprinting faz algo parecido: em vez de pedir seu nome, ele observa características técnicas do navegador para decidir se "já viu você antes".
 
-O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você continua entrando normalmente, mas com detalhes menos únicos e com pequenas mudanças por sessão, ficando mais parecido com “mais uma pessoa comum” do que com alguém fácil de reconhecer à distância.
+O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você continua entrando normalmente, mas com detalhes menos únicos e com pequenas mudanças por sessão, ficando mais parecido com "mais uma pessoa comum" do que com alguém fácil de reconhecer à distância.
 
 ## Recursos
 
@@ -84,6 +86,48 @@ Passos manuais:
 2. Visite [BrowserLeaks](https://browserleaks.com/) ou outro teste de fingerprint.
 3. Compare o comportamento do navegador com e sem o script ativado.
 4. Verifique possíveis mudanças em canvas, WebGL, timezone e outros sinais expostos.
+
+## Canvas — Antes e Depois
+
+Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) comparando o comportamento com e sem o script ativo.
+
+| Campo | Com o script | Sem o script |
+|---|---|---|
+| **Signature** | `8D90D8D3DCAEA9CAF5DCAA8803BCCD3D` | `46CB33F5471311B5329087A2E5FCE3A2` |
+| **Uniqueness** | 99.96% | **100% (único no banco)** |
+| **File Size** | 5594 bytes | 5709 bytes |
+| **Number of Colors** | 220 | 233 |
+
+**O que isso mostra:**
+
+- As assinaturas são completamente diferentes — o ruído injetado no canvas altera o hash de forma efetiva.
+- Sem o script, o canvas é 100% único no banco do BrowserLeaks, ou seja, rastreável com precisão.
+- Com o script, o site enxerga uma assinatura diferente da real, dificultando a identificação.
+- A diferença no File Size e Number of Colors confirma que os pixels foram alterados de verdade.
+
+> Teste feito com Chrome no Windows 10. Resultados podem variar por navegador e hardware.
+
+## Metadata sugerido
+
+```javascript
+// ==UserScript==
+// @name         Low-Profile-Fingerprint
+// @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
+// @version      1.0.0
+// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento.
+// @author       Rony Gabriel
+// @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
+// @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
+// @updateURL    https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
+// @downloadURL  https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
+// @match        *://*/*
+// @run-at       document-start
+// @grant        unsafeWindow
+// @grant        GM_getValue
+// @grant        GM_setValue
+// @grant        GM_registerMenuCommand
+// ==/UserScript==
+```
 
 ## Limitações
 
