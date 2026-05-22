@@ -110,7 +110,7 @@ Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) compar
 - Com o script, o site enxerga uma assinatura diferente da real, dificultando a identificação.
 - A diferença no File Size e Number of Colors confirma que os pixels foram alterados de verdade.
 
-> Teste feito com Chrome no Windows 10. Resultados podem variar por navegador e hardware.
+> Teste feito com Comet/Chrome/Firefox no Windows 11. Resultados podem variar por navegador e hardware.
 
 ## Metadata sugerido
 
