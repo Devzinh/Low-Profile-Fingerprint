@@ -34,7 +34,7 @@ Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização
 
 Imagine que entrar em um site é como entrar em um shopping onde um segurança tenta reconhecer cada visitante pela roupa, pelo jeito de andar, pelo relógio e pelos detalhes do tênis. Browser fingerprinting faz algo parecido: em vez de pedir seu nome, ele observa características técnicas do navegador para decidir se “já viu você antes”.
 
-O **No Fingerprint** funciona como um disfarce leve e coerente. Você continua entrando normalmente, mas com detalhes menos únicos e com pequenas mudanças por sessão, ficando mais parecido com “mais uma pessoa comum” do que com alguém fácil de reconhecer à distância.
+O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você continua entrando normalmente, mas com detalhes menos únicos e com pequenas mudanças por sessão, ficando mais parecido com “mais uma pessoa comum” do que com alguém fácil de reconhecer à distância.
 
 ## Recursos
 
@@ -42,27 +42,37 @@ O **No Fingerprint** funciona como um disfarce leve e coerente. Você continua e
 - Ruído leve e consistente por sessão
 - Normalização defensiva de múltiplas APIs do navegador
 - Menu de configuração com ativação e desativação de patches
-- Compatibilidade com gerenciadores como Tampermonkey e similares.
+- Compatibilidade com gerenciadores como Tampermonkey e similares
 
 ## Instalação
 
+Você pode instalar a versão mais recente diretamente pelo repositório:
+
+- [Instalar via Tampermonkey / Userscript manager](https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js)
+
+Passos manuais:
+
 1. Instale um gerenciador de userscripts, como Tampermonkey ou Violentmonkey.
 2. Habilite a opção de permitir scripts de usuário no navegador/extensão, se ela aparecer.
-3. Abra o arquivo `no-fingerprint.user.js`.
+3. Abra o arquivo `low-profile-fingerprint.user.js`.
 4. Instale o script pelo gerenciador.
 5. Recarregue as páginas em que deseja testar o comportamento.
+
+## Screenshot
+
+Você pode adicionar aqui, no futuro, screenshots de testes em sites como BrowserLeaks ou da interface/menu do script para mostrar o efeito do projeto na prática.
 
 ## Metadata sugerido
 
 ```javascript
 // ==UserScript==
-// @name         No Fingerprint
-// @namespace    https://github.com/Devzinh/no-fingerprint
+// @name         Low-Profile-Fingerprint
+// @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
 // @version      1.0.0
 // @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento.
 // @author       Rony Gabriel
-// @homepageURL  https://github.com/Devzinh/no-fingerprint
-// @supportURL   https://github.com/Devzinh/no-fingerprint/issues
+// @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
+// @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
 // @match        *://*/*
 // @run-at       document-start
 // @grant        unsafeWindow
@@ -84,6 +94,16 @@ Também é possível que alguns sites reajam de forma inesperada a mudanças em 
 - Projeto de portfólio voltado a privacidade e segurança
 - Testes defensivos com userscripts
 - Exploração de APIs de navegador e normalização de sinais
+
+## Contribuição
+
+Sugestões, issues e pull requests são bem-vindos.
+
+Se quiser contribuir, você pode:
+- reportar incompatibilidades com sites
+- sugerir novos patches
+- melhorar a documentação
+- propor ajustes de compatibilidade e privacidade
 
 ## Roadmap
 
