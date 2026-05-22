@@ -19,6 +19,7 @@ Userscript that reduces browser fingerprint uniqueness with lightweight per-sess
 - [Features](#features)
 - [Installation](#installation)
 - [Quick test](#quick-test)
+- [Canvas — Before and After](#canvas--before-and-after)
 - [Suggested metadata](#suggested-metadata)
 - [Limitations](#limitations)
 - [Use cases](#use-cases)
@@ -53,9 +54,9 @@ This approach follows a defensive anti-fingerprinting strategy based on normaliz
 
 ## Analogy
 
-Imagine visiting a website as entering a mall where a security guard tries to recognize each visitor by their clothes, the way they walk, their watch, and the details of their shoes. Browser fingerprinting works in a similar way: instead of asking for your name, it observes technical browser traits to decide whether it has “seen you before.”
+Imagine visiting a website as entering a mall where a security guard tries to recognize each visitor by their clothes, the way they walk, their watch, and the details of their shoes. Browser fingerprinting works in a similar way: instead of asking for your name, it observes technical browser traits to decide whether it has "seen you before."
 
-**Low-Profile-Fingerprint** works like a light, consistent disguise. You still enter normally, but with less unique details and small per-session changes, making you look more like “just another regular person” than someone easy to recognize from a distance.
+**Low-Profile-Fingerprint** works like a light, consistent disguise. You still enter normally, but with less unique details and small per-session changes, making you look more like "just another regular person" than someone easy to recognize from a distance.
 
 ## Features
 
@@ -82,21 +83,29 @@ Manual steps:
 ## Quick test
 
 1. Install the script normally.
-2. Visit [BrowserLeaks Canvas](https://browserleaks.com/canvas) or another fingerprint testing website.
+2. Visit [BrowserLeaks](https://browserleaks.com/) or another fingerprint testing website.
 3. Compare browser behavior with and without the script enabled.
-4. Check for differences in canvas, WebGL, timezone, and other exposed signals.
+4. Check for possible differences in canvas, WebGL, timezone, and other exposed signals.
 
-### Before
+## Canvas — Before and After
 
-<p align="center">
-  <img src="assets/browserleaks-before.png" alt="BrowserLeaks Canvas result before using Low-Profile-Fingerprint" width="700">
-</p>
+Test performed on [BrowserLeaks Canvas](https://browserleaks.com/canvas) comparing behavior with and without the script active.
 
-### After
+| Field | With script | Without script |
+|---|---|---|
+| **Signature** | `8D90D8D3DCAEA9CAF5DCAA8803BCCD3D` | `46CB33F5471311B5329087A2E5FCE3A2` |
+| **Uniqueness** | 99.96% | **100% (unique in database)** |
+| **File Size** | 5594 bytes | 5709 bytes |
+| **Number of Colors** | 220 | 233 |
 
-<p align="center">
-  <img src="assets/browserleaks-after.png" alt="BrowserLeaks Canvas result after using Low-Profile-Fingerprint" width="700">
-</p>
+**What this shows:**
+
+- The signatures are completely different — the noise injected into the canvas effectively alters the hash.
+- Without the script, the canvas is 100% unique in BrowserLeaks' database, meaning it is trivially trackable.
+- With the script, the site sees a different signature from the real one, making identification harder.
+- The difference in File Size and Number of Colors confirms that the pixels were actually altered by the patch.
+
+> Test performed with Chrome on Windows 10. Results may vary by browser and hardware.
 
 ## Suggested metadata
 
