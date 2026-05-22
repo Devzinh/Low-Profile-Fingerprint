@@ -19,7 +19,6 @@ Userscript that reduces browser fingerprint uniqueness with lightweight per-sess
 - [Features](#features)
 - [Installation](#installation)
 - [Quick test](#quick-test)
-- [Suggested metadata](#suggested-metadata)
 - [Limitations](#limitations)
 - [Use cases](#use-cases)
 - [Contributing](#contributing)
@@ -85,28 +84,6 @@ Manual steps:
 2. Visit [BrowserLeaks](https://browserleaks.com/) or another fingerprint testing website.
 3. Compare browser behavior with and without the script enabled.
 4. Check for possible differences in canvas, WebGL, timezone, and other exposed signals.
-
-## Suggested metadata
-
-```javascript
-// ==UserScript==
-// @name         Low-Profile-Fingerprint
-// @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.0.0
-// @description  Disguise your browser by normalizing common fingerprint signals and adding lightweight per-session noise to reduce tracking.
-// @author       Rony Gabriel
-// @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
-// @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
-// @updateURL    https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
-// @downloadURL  https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
-// @match        *://*/*
-// @run-at       document-start
-// @grant        unsafeWindow
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        GM_registerMenuCommand
-// ==/UserScript==
-```
 
 ## Limitations
 
