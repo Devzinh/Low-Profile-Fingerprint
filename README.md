@@ -19,7 +19,6 @@ Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve 
 - [Recursos](#recursos)
 - [Instalação](#instalação)
 - [Teste rápido](#teste-rápido)
-- [Metadata sugerido](#metadata-sugerido)
 - [Limitações](#limitações)
 - [Casos de uso](#casos-de-uso)
 - [Contribuição](#contribuição)
