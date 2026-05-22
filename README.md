@@ -1,10 +1,31 @@
 # Low-Profile-Fingerprint
 
+[![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+[![Issues](https://img.shields.io/github/issues/Devzinh/Low-Profile-Fingerprint)](https://github.com/Devzinh/Low-Profile-Fingerprint/issues)
+
 <p align="center">
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
 Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva.
+
+**English version:** coming soon.
+
+## Índice
+
+- [Visão geral](#visão-geral)
+- [Como funciona](#como-funciona)
+- [Analogia](#analogia)
+- [Recursos](#recursos)
+- [Instalação](#instalação)
+- [Teste rápido](#teste-rápido)
+- [Metadata sugerido](#metadata-sugerido)
+- [Limitações](#limitações)
+- [Casos de uso](#casos-de-uso)
+- [Contribuição](#contribuição)
+- [Roadmap](#roadmap)
+- [Suporte](#suporte)
+- [Licença](#licença)
 
 ## Visão geral
 
@@ -58,9 +79,16 @@ Passos manuais:
 4. Instale o script pelo gerenciador.
 5. Recarregue as páginas em que deseja testar o comportamento.
 
+## Teste rápido
+
+1. Instale o script normalmente.
+2. Visite [BrowserLeaks](https://browserleaks.com/) ou outro teste de fingerprint.
+3. Compare o comportamento do navegador com e sem o script ativado.
+4. Verifique possíveis mudanças em canvas, WebGL, timezone e outros sinais expostos.
+
 ## Screenshot
 
-Você pode adicionar aqui, no futuro, screenshots de testes em sites como BrowserLeaks ou da interface/menu do script para mostrar o efeito do projeto na prática.
+Você já pode usar o banner atual como imagem principal do projeto. No futuro, vale adicionar screenshots ou GIFs de testes práticos em sites como BrowserLeaks para mostrar o efeito do script.
 
 ## Metadata sugerido
 
@@ -73,6 +101,8 @@ Você pode adicionar aqui, no futuro, screenshots de testes em sites como Browse
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
+// @updateURL    https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
+// @downloadURL  https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
 // @match        *://*/*
 // @run-at       document-start
 // @grant        unsafeWindow
@@ -113,18 +143,9 @@ Se quiser contribuir, você pode:
 - Publicar versão instalável por release
 - Adicionar testes de compatibilidade por site
 
-## Topics sugeridos
+## Suporte
 
-Use estes tópicos no GitHub para melhorar a descoberta do repositório:
-
-- `userscript`
-- `tampermonkey`
-- `privacy`
-- `browser-fingerprinting`
-- `fingerprint-protection`
-- `anti-tracking`
-- `javascript`
-- `security`
+- [Abrir uma issue](https://github.com/Devzinh/Low-Profile-Fingerprint/issues)
 
 ## Licença
 
