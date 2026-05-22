@@ -2,6 +2,8 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/Devzinh/Low-Profile-Fingerprint)](https://github.com/Devzinh/Low-Profile-Fingerprint/issues)
+[![Userscript Manager Support](https://img.shields.io/badge/Tampermonkey%20%7C%20Violentmonkey-supported-blueviolet.svg)](#installation)
+[![Language](https://img.shields.io/badge/language-PT--BR%20%7C%20EN-blue.svg)](#)
 
 <p align="center">
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
@@ -15,6 +17,7 @@ Userscript that reduces browser fingerprint uniqueness with lightweight per-sess
 
 - [Overview](#overview)
 - [How it works](#how-it-works)
+- [How Signals are Handled](#how-signals-are-handled)
 - [Analogy](#analogy)
 - [Features](#features)
 - [Installation](#installation)
@@ -52,6 +55,16 @@ Signals handled by the script include:
 
 This approach follows a defensive anti-fingerprinting strategy based on normalization and lightweight noise: reducing stability and uniqueness of exposed signals without making the browser obviously fake or internally inconsistent.
 
+## How Signals are Handled
+
+| API / Feature | Method Used | Privacy Objective |
+| :--- | :--- | :--- |
+| **Canvas 2D** | Dynamic Noise Injection | Minor adjustments to pixel channels to yield unique canvas hash signatures per session. |
+| **WebGL** | String Spoofing & Noise | Standardizes `VENDOR` and `RENDERER` strings to common patterns and adds WebGL pixel buffer noise. |
+| **Screen & Window** | Coherent Normalization | Standardizes screen dimensions and usable area to common resolution presets. |
+| **Audio / Fonts** | Measurement Noise | Adds micro-variations to font dimension and audio output APIs without breaking functionality. |
+| **Battery / Connection** | Static Facade | Substitutes battery telemetry and active network connection details with plausible default values. |
+
 ## Analogy
 
 Imagine visiting a website as entering a mall where a security guard tries to recognize each visitor by their clothes, the way they walk, their watch, and the details of their shoes. Browser fingerprinting works in a similar way: instead of asking for your name, it observes technical browser traits to decide whether it has "seen you before."
@@ -83,9 +96,15 @@ Manual steps:
 ## Quick test
 
 1. Install the script normally.
-2. Visit [BrowserLeaks](https://browserleaks.com/) or another fingerprint testing website.
+2. Visit one of the recommended test tools listed below.
 3. Compare browser behavior with and without the script enabled.
 4. Check for possible differences in canvas, WebGL, timezone, and other exposed signals.
+
+### Recommended test tools
+
+- **[BrowserLeaks](https://browserleaks.com/)**: Great for testing specific signatures like Canvas, WebGL, fonts, and battery/geolocation APIs.
+- **[CreepJS](https://abrahamjuliot.github.io/creepjs/)**: One of the most advanced tools for testing noise robustness and checking if APIs look simulated or genuine.
+- **[Cover Your Tracks (EFF)](https://coveryourtracks.eff.org/)**: Tool developed by the Electronic Frontier Foundation to evaluate your overall tracking index and uniqueness.
 
 ## Canvas — Before and After
 
@@ -98,6 +117,18 @@ Test performed on [BrowserLeaks Canvas](https://browserleaks.com/canvas) compari
 | **File Size** | 5594 bytes | 5709 bytes |
 | **Number of Colors** | 220 | 233 |
 
+### Without the script
+
+<p align="center">
+  <img src="assets/browserleaks-before.png" alt="Canvas fingerprint without the script" width="700">
+</p>
+
+### With the script
+
+<p align="center">
+  <img src="assets/browserleaks-after.png" alt="Canvas fingerprint with the script active" width="700">
+</p>
+
 **What this shows:**
 
 - The signatures are completely different — the noise injected into the canvas effectively alters the hash.
@@ -105,7 +136,7 @@ Test performed on [BrowserLeaks Canvas](https://browserleaks.com/canvas) compari
 - With the script, the site sees a different signature from the real one, making identification harder.
 - The difference in File Size and Number of Colors confirms that the pixels were actually altered by the patch.
 
-> Test performed with Chrome on Windows 10. Results may vary by browser and hardware.
+> Test performed with Comet/Chrome/Firefox on Windows 11. Results may vary by browser and hardware.
 
 ## Suggested metadata
 
