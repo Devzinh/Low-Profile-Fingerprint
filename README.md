@@ -91,16 +91,16 @@ Passos manuais:
 
 Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) comparando o comportamento com e sem o script ativo.
 
-### Com o script ativo
-
-<p align="center">
-  <img src="assets/canvas-com-script.png" alt="Canvas fingerprint com o script ativo" width="700">
-</p>
-
 ### Sem o script
 
 <p align="center">
-  <img src="assets/canvas-sem-script.png" alt="Canvas fingerprint sem o script" width="700">
+  <img src="assets/browserleaks-before.png" alt="Canvas fingerprint sem o script" width="700">
+</p>
+
+### Com o script
+
+<p align="center">
+  <img src="assets/browserleaks-after.png" alt="Canvas fingerprint com o script ativo" width="700">
 </p>
 
 **O que isso mostra:**
