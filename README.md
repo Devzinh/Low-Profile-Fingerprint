@@ -86,32 +86,6 @@ Passos manuais:
 3. Compare o comportamento do navegador com e sem o script ativado.
 4. Verifique possíveis mudanças em canvas, WebGL, timezone e outros sinais expostos.
 
-## Screenshot
-
-Você já pode usar o banner atual como imagem principal do projeto. No futuro, vale adicionar screenshots ou GIFs de testes práticos em sites como BrowserLeaks para mostrar o efeito do script.
-
-## Metadata sugerido
-
-```javascript
-// ==UserScript==
-// @name         Low-Profile-Fingerprint
-// @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.0.0
-// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento.
-// @author       Rony Gabriel
-// @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
-// @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
-// @updateURL    https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
-// @downloadURL  https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
-// @match        *://*/*
-// @run-at       document-start
-// @grant        unsafeWindow
-// @grant        GM_getValue
-// @grant        GM_setValue
-// @grant        GM_registerMenuCommand
-// ==/UserScript==
-```
-
 ## Limitações
 
 Este projeto não promete anonimato total. Browser fingerprinting combina muitos sinais diferentes, e técnicas anti-fingerprinting mal calibradas podem até tornar um navegador mais identificável quando criam padrões raros ou inconsistentes.
