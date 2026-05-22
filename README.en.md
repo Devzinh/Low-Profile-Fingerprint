@@ -86,7 +86,7 @@ Manual steps:
 3. Compare browser behavior with and without the script enabled.
 4. Check for differences in canvas, WebGL, timezone, and other exposed signals.
 
-Example: in a BrowserLeaks Canvas test, the page reported a canvas signature of `46CB33F5471311B5329087A2E5FCE3A2` with 100% uniqueness in its database.[page:150]
+Example: in a BrowserLeaks Canvas test, the page reported a canvas signature of `46CB33F5471311B5329087A2E5FCE3A2` with 100% uniqueness in its database.
 
 ## Suggested metadata
 
