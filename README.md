@@ -2,6 +2,8 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Issues](https://img.shields.io/github/issues/Devzinh/Low-Profile-Fingerprint)](https://github.com/Devzinh/Low-Profile-Fingerprint/issues)
+[![Suporte a Gerenciadores](https://img.shields.io/badge/Tampermonkey%20%7C%20Violentmonkey-suportado-blueviolet.svg)](#instalação)
+[![Idioma](https://img.shields.io/badge/idioma-PT--BR%20%7C%20EN-blue.svg)](#)
 
 <p align="center">
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
@@ -15,6 +17,7 @@ Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve 
 
 - [Visão geral](#visão-geral)
 - [Como funciona](#como-funciona)
+- [Como os Sinais São Tratados](#como-os-sinais-são-tratados)
 - [Analogia](#analogia)
 - [Recursos](#recursos)
 - [Instalação](#instalação)
@@ -52,6 +55,16 @@ Entre os sinais tratados pelo script estão:
 
 Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização e ruído leve: reduzir a estabilidade e a singularidade de sinais expostos sem tornar o navegador obviamente falso ou incoerente.
 
+## Como os Sinais São Tratados
+
+| API / Recurso | Método Utilizado | Objetivo de Privacidade |
+| :--- | :--- | :--- |
+| **Canvas 2D** | Injeção de Ruído Dinâmico | Altera levemente o canal de pixels para gerar hashes de assinatura sempre diferentes por sessão. |
+| **WebGL** | Spoofing de Strings & Ruído | Normaliza os valores de `VENDOR` e `RENDERER` para padrões genéricos e insere ruído em capturas de pixel buffer. |
+| **Screen & Window** | Normalização Coerente | Padroniza dimensões de tela e áreas disponíveis para resoluções comuns do mercado. |
+| **Audio / Fonts** | Ruído em Medições | Adiciona microvariações em leituras de fontes e saídas de áudio sem distorcer o funcionamento. |
+| **Battery / Connection** | Fachada Estática | Substitui dados reais de bateria e conexões dinâmicas por propriedades padrão plausíveis. |
+
 ## Analogia
 
 Imagine que entrar em um site é como entrar em um shopping onde um segurança tenta reconhecer cada visitante pela roupa, pelo jeito de andar, pelo relógio e pelos detalhes do tênis. Browser fingerprinting faz algo parecido: em vez de pedir seu nome, ele observa características técnicas do navegador para decidir se "já viu você antes".
@@ -83,13 +96,26 @@ Passos manuais:
 ## Teste rápido
 
 1. Instale o script normalmente.
-2. Visite [BrowserLeaks](https://browserleaks.com/) ou outro teste de fingerprint.
+2. Visite uma das ferramentas recomendadas abaixo.
 3. Compare o comportamento do navegador com e sem o script ativado.
 4. Verifique possíveis mudanças em canvas, WebGL, timezone e outros sinais expostos.
+
+### Ferramentas recomendadas para teste
+
+- **[BrowserLeaks](https://browserleaks.com/)**: Excelente para testar assinaturas específicas como Canvas, WebGL, fontes e APIs de geolocalização/bateria.
+- **[CreepJS](https://abrahamjuliot.github.io/creepjs/)**: Uma das ferramentas mais avançadas para testar a robustez do ruído e se as APIs parecem simuladas ou genuínas.
+- **[Cover Your Tracks (EFF)](https://coveryourtracks.eff.org/)**: Ferramenta da Electronic Frontier Foundation para conferir seu índice geral de rastreabilidade e unicidade.
 
 ## Canvas — Antes e Depois
 
 Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) comparando o comportamento com e sem o script ativo.
+
+| Campo | Com script | Sem script |
+|---|---|---|
+| **Assinatura** | `8D90D8D3DCAEA9CAF5DCAA8803BCCD3D` | `46CB33F5471311B5329087A2E5FCE3A2` |
+| **Unicidade** | 99,96% | **100% (único no banco de dados)** |
+| **Tamanho do Arquivo** | 5594 bytes | 5709 bytes |
+| **Quantidade de Cores** | 220 | 233 |
 
 ### Sem o script
 
