@@ -91,12 +91,17 @@ Passos manuais:
 
 Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) comparando o comportamento com e sem o script ativo.
 
-| Campo | Com o script | Sem o script |
-|---|---|---|
-| **Signature** | `8D90D8D3DCAEA9CAF5DCAA8803BCCD3D` | `46CB33F5471311B5329087A2E5FCE3A2` |
-| **Uniqueness** | 99.96% | **100% (único no banco)** |
-| **File Size** | 5594 bytes | 5709 bytes |
-| **Number of Colors** | 220 | 233 |
+### Com o script ativo
+
+<p align="center">
+  <img src="assets/canvas-com-script.png" alt="Canvas fingerprint com o script ativo" width="700">
+</p>
+
+### Sem o script
+
+<p align="center">
+  <img src="assets/canvas-sem-script.png" alt="Canvas fingerprint sem o script" width="700">
+</p>
 
 **O que isso mostra:**
 
