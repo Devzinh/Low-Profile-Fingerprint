@@ -9,7 +9,7 @@
 
 Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva.
 
-**English version:** coming soon.
+**English version:** [README.en.md](README.en.md)
 
 ## Índice
 
