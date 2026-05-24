@@ -9,7 +9,7 @@
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
-Userscript para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva.
+Userscript v1.1.0 para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva.
 
 **English version:** [README.en.md](README.en.md)
 
@@ -47,11 +47,12 @@ Entre os sinais tratados pelo script estão:
 - `navigator` (hardware concurrency, memória do dispositivo, plugins e mimeTypes)
 - `timezone` (`getTimezoneOffset` e `Intl.DateTimeFormat().resolvedOptions()`)
 - `canvas` (`getImageData`, `toDataURL`, `toBlob`)
+- `audio` (`AudioBuffer.getChannelData` e `AnalyserNode.getFloatFrequencyData`)
 - `fonts` via ruído leve em medições de texto
 - `connection` (`rtt`, `downlink`, `effectiveType`, `type`)
 - `speechSynthesis` (normalização da lista de vozes)
 - `battery` (fachada para propriedades da Battery API)
-- `WebGL` (vendor, renderer e alguns parâmetros)
+- `WebGL` (vendor, renderer, parâmetros selecionados e `readPixels`)
 
 Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização e ruído leve: reduzir a estabilidade e a singularidade de sinais expostos sem tornar o navegador obviamente falso ou incoerente.
 
@@ -60,7 +61,7 @@ Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização
 | API / Recurso | Método Utilizado | Objetivo de Privacidade |
 | :--- | :--- | :--- |
 | **Canvas 2D** | Injeção de Ruído Dinâmico | Altera levemente o canal de pixels para gerar hashes de assinatura sempre diferentes por sessão. |
-| **WebGL** | Spoofing de Strings & Ruído | Normaliza os valores de `VENDOR` e `RENDERER` para padrões genéricos e insere ruído em capturas de pixel buffer. |
+| **WebGL** | Spoofing de Strings & Ruído | Normaliza os valores de `VENDOR` e `RENDERER` para padrões genéricos e insere ruído em capturas de pixel buffer via `readPixels`. |
 | **Screen & Window** | Normalização Coerente | Padroniza dimensões de tela e áreas disponíveis para resoluções comuns do mercado. |
 | **Audio / Fonts** | Ruído em Medições | Adiciona microvariações em leituras de fontes e saídas de áudio sem distorcer o funcionamento. |
 | **Battery / Connection** | Fachada Estática | Substitui dados reais de bateria e conexões dinâmicas por propriedades padrão plausíveis. |
@@ -76,6 +77,7 @@ O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você c
 - Execução antecipada com `@run-at document-start`
 - Ruído leve e consistente por sessão
 - Normalização defensiva de múltiplas APIs do navegador
+- Wrappers com proteção contra aplicação duplicada e menor exposição via `Function.prototype.toString`
 - Menu de configuração com ativação e desativação de patches
 - Compatibilidade com gerenciadores como Tampermonkey e similares
 
@@ -83,7 +85,7 @@ O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você c
 
 Você pode instalar a versão mais recente diretamente pelo repositório:
 
-- [Instalar via Tampermonkey / Userscript manager](https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js)
+- [Instalar via Tampermonkey / Userscript manager](https://raw.githubusercontent.com/Devzinh/Low-Profile-Fingerprint/main/low-profile-fingerprint.user.js)
 
 Passos manuais:
 
@@ -144,13 +146,14 @@ Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) compar
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.0.0
+// @version      1.1.0
 // @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
 // @updateURL    https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
 // @downloadURL  https://github.com/Devzinh/Low-Profile-Fingerprint/raw/main/low-profile-fingerprint.user.js
+// @license      MIT
 // @match        *://*/*
 // @run-at       document-start
 // @grant        unsafeWindow
@@ -164,7 +167,7 @@ Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) compar
 
 Este projeto não promete anonimato total. Browser fingerprinting combina muitos sinais diferentes, e técnicas anti-fingerprinting mal calibradas podem até tornar um navegador mais identificável quando criam padrões raros ou inconsistentes.
 
-Também é possível que alguns sites reajam de forma inesperada a mudanças em APIs como canvas, WebGL, timezone ou battery, especialmente em aplicações muito sensíveis a ambiente gráfico ou detecção de hardware.
+Também é possível que alguns sites reajam de forma inesperada a mudanças em APIs como canvas, WebGL, áudio, timezone ou battery, especialmente em aplicações muito sensíveis a ambiente gráfico, processamento de áudio ou detecção de hardware.
 
 ## Casos de uso
 
@@ -198,3 +201,4 @@ Se quiser contribuir, você pode:
 ## Licença
 
 MIT
+
