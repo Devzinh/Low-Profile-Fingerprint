@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.1.0
-// @description  Disfarca seu navegador: normaliza sinais comuns de fingerprint e adiciona ruido leve por sessao para reduzir rastreamento sem quebrar sites.
+// @version      1.1.1
+// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
@@ -21,7 +21,7 @@
   'use strict';
 
   const SCRIPT_NAME = 'Low-Profile Fingerprint';
-  const SCRIPT_VERSION = '1.1.0';
+  const SCRIPT_VERSION = '1.1.1';
   const root = typeof unsafeWindow === 'object' && unsafeWindow ? unsafeWindow : window;
   const mark = typeof Symbol === 'function' ? Symbol.for('lowProfileFingerprint.wrapped') : '__lowProfileFingerprintWrapped__';
   const nativeSource = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -193,7 +193,7 @@
       colorDepth: 24,
       pixelDepth: 24,
       timezoneOffset: offset,
-      timezoneLabel: timezoneForOffset(offset, seed),
+      timezoneLabel: nativeTimezoneLabel() || 'UTC',
       nativeTimezoneLabel: nativeTimezoneLabel(),
       hardwareConcurrency: clamp(bucket(nav.hardwareConcurrency || 8, 2), 2, 16),
       deviceMemory: typeof nav.deviceMemory === 'number' ? clamp(bucket(nav.deviceMemory, 2), 2, 16) : undefined,
@@ -229,38 +229,6 @@
     try {
       const formatter = new Native.dtf();
       return Native.resolvedOptions.call(formatter).timeZone || null;
-    } catch (_) {
-      return null;
-    }
-  }
-
-  function timezoneForOffset(offset, seed) {
-    let zones = ['UTC'];
-    try {
-      if (Native.supportedValuesOf) zones = Native.supportedValuesOf('timeZone');
-    } catch (_) {}
-    const now = new Native.DateCtor();
-    const matches = Array.from(zones).filter((zone) => offsetForZone(zone, now) === offset);
-    return pick(rng(seed + '|timezone'), matches.length ? matches : ['UTC']);
-  }
-
-  function offsetForZone(zone, date) {
-    try {
-      const parts = new Native.dtf('en-US-u-ca-gregory-nu-latn', {
-        timeZone: zone,
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
-        hourCycle: 'h23',
-      }).formatToParts(date).reduce((acc, part) => {
-        if (part.type !== 'literal') acc[part.type] = part.value;
-        return acc;
-      }, {});
-      const utc = Date.UTC(+parts.year, +parts.month - 1, +parts.day, +parts.hour === 24 ? 0 : +parts.hour, +parts.minute, +parts.second);
-      return -Math.round((utc - Math.floor(date.getTime() / 1000) * 1000) / 60000);
     } catch (_) {
       return null;
     }

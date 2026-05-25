@@ -9,7 +9,7 @@
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
-Userscript v1.1.0 that reduces browser fingerprint uniqueness with lightweight per-session noise and defensive normalization.
+Userscript v1.1.1 that reduces browser fingerprint uniqueness with lightweight per-session noise and defensive normalization.
 
 **Portuguese version:** [README.md](README.md)
 
@@ -146,8 +146,8 @@ Test performed on [BrowserLeaks Canvas](https://browserleaks.com/canvas) compari
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.1.0
-// @description  Disguise your browser by normalizing common fingerprint signals and adding lightweight per-session noise to reduce tracking.
+// @version      1.1.1
+// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
