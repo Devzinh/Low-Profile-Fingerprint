@@ -366,7 +366,6 @@
   }
 
   // v1.3.0: per-domain opt-out so sites broken by the patches can run untouched.
-  const excludedKey = 'lowProfileFingerprint.excludedHosts';
 
   function normalizeHost(value) {
     return String(value || '').trim().toLowerCase().replace(/^\.+|\.+$/g, '');
@@ -375,8 +374,8 @@
   function readExcluded() {
     try {
       if (typeof GM_getValue !== 'function') return [];
-      const raw = GM_getValue(excludedKey, '[]');
-      const list = JSON.parse(typeof raw === 'string' ? raw : '[]');
+      const raw = GM_getValue('lowProfileFingerprint.excludedHosts', '[]');
+      const list = Array.isArray(raw) ? raw : JSON.parse(typeof raw === 'string' ? raw : '[]');
       return Array.isArray(list) ? list.map(normalizeHost).filter(Boolean) : [];
     } catch (_) {
       return [];
@@ -385,7 +384,7 @@
 
   function writeExcluded(list) {
     try {
-      if (typeof GM_setValue === 'function') GM_setValue(excludedKey, JSON.stringify(list));
+      if (typeof GM_setValue === 'function') GM_setValue('lowProfileFingerprint.excludedHosts', JSON.stringify(list));
     } catch (_) {}
   }
 
