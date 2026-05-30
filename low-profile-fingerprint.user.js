@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.2.0
+// @version      1.3.0
 // @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
@@ -21,7 +21,7 @@
   'use strict';
 
   const SCRIPT_NAME = 'Low-Profile Fingerprint';
-  const SCRIPT_VERSION = '1.2.0';
+  const SCRIPT_VERSION = '1.3.0';
   const root = typeof unsafeWindow === 'object' && unsafeWindow ? unsafeWindow : window;
   const mark = typeof Symbol === 'function' ? Symbol.for('lowProfileFingerprint.wrapped') : '__lowProfileFingerprintWrapped__';
   const nativeSource = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -59,25 +59,28 @@
     return acc;
   }, {});
   const session = makeProfile(makeSeed());
+  const disabledHere = isExcludedHost(host());
 
-  patchToString();
   registerMenu();
-  [
-    ['screen', patchScreen],
-    ['navigator', patchNavigator],
-    ['timezone', patchTimezone],
-    ['canvas', patchCanvas],
-    ['fonts', patchFonts],
-    ['connection', patchConnection],
-    ['speech', patchSpeech],
-    ['battery', patchBattery],
-    ['webgl', patchWebGL],
-    ['webglPixels', patchWebGLPixels],
-    ['audio', patchAudio],
-  ].forEach(([key, patch]) => {
-    if (!settings[key]) return;
-    try { patch(); } catch (_) {}
-  });
+  if (!disabledHere) {
+    patchToString();
+    [
+      ['screen', patchScreen],
+      ['navigator', patchNavigator],
+      ['timezone', patchTimezone],
+      ['canvas', patchCanvas],
+      ['fonts', patchFonts],
+      ['connection', patchConnection],
+      ['speech', patchSpeech],
+      ['battery', patchBattery],
+      ['webgl', patchWebGL],
+      ['webglPixels', patchWebGLPixels],
+      ['audio', patchAudio],
+    ].forEach(([key, patch]) => {
+      if (!settings[key]) return;
+      try { patch(); } catch (_) {}
+    });
+  }
 
   // REFACTOR v1.2.0: snapshot real browser signals before any patch replaces getters.
   function capture(win) {
@@ -362,13 +365,56 @@
     } catch (_) {}
   }
 
+  // v1.3.0: per-domain opt-out so sites broken by the patches can run untouched.
+  const excludedKey = 'lowProfileFingerprint.excludedHosts';
+
+  function normalizeHost(value) {
+    return String(value || '').trim().toLowerCase().replace(/^\.+|\.+$/g, '');
+  }
+
+  function readExcluded() {
+    try {
+      if (typeof GM_getValue !== 'function') return [];
+      const raw = GM_getValue(excludedKey, '[]');
+      const list = JSON.parse(typeof raw === 'string' ? raw : '[]');
+      return Array.isArray(list) ? list.map(normalizeHost).filter(Boolean) : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  function writeExcluded(list) {
+    try {
+      if (typeof GM_setValue === 'function') GM_setValue(excludedKey, JSON.stringify(list));
+    } catch (_) {}
+  }
+
+  function isExcludedHost(current) {
+    const target = normalizeHost(current);
+    if (!target) return false;
+    return readExcluded().some((entry) => target === entry || target.endsWith('.' + entry));
+  }
+
+  function toggleExcluded(current) {
+    const target = normalizeHost(current);
+    if (!target) return false;
+    const list = readExcluded();
+    const index = list.indexOf(target);
+    if (index === -1) list.push(target);
+    else list.splice(index, 1);
+    writeExcluded(list);
+    return index === -1;
+  }
+
   function registerMenu() {
     try {
       if (typeof GM_registerMenuCommand !== 'function') return;
+      const currentHost = host();
       GM_registerMenuCommand(SCRIPT_NAME + ': perfil da sessao', () => {
         const lines = [
           SCRIPT_NAME + ' v' + SCRIPT_VERSION,
           '',
+          'Site: ' + (currentHost || '(desconhecido)') + (disabledHere ? ' [desativado]' : ' [ativo]'),
           'Vendor: ' + session.webglVendor,
           'Renderer: ' + session.webglRenderer,
           'Screen: ' + session.width + 'x' + session.height,
@@ -379,6 +425,12 @@
         Object.keys(defaults).forEach((patch) => lines.push((readSetting(patch) ? '[on] ' : '[off] ') + labels[patch]));
         root.alert(lines.join('\n'));
       });
+      if (currentHost) {
+        GM_registerMenuCommand(SCRIPT_NAME + ': ' + (disabledHere ? 'Ativar' : 'Desativar') + ' neste site', () => {
+          const nowExcluded = toggleExcluded(currentHost);
+          root.alert(SCRIPT_NAME + (nowExcluded ? ' desativado' : ' ativado') + ' em ' + currentHost + '. Recarregue a pagina para aplicar.');
+        });
+      }
       Object.keys(defaults).forEach((patch) => {
         GM_registerMenuCommand(SCRIPT_NAME + ': ' + (settings[patch] ? 'Desativar ' : 'Ativar ') + labels[patch], () => {
           const next = !readSetting(patch);
