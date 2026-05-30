@@ -9,7 +9,7 @@
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
-Userscript v1.2.0 para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva baseada em dados reais do ambiente.
+Userscript v1.3.0 para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva baseada em dados reais do ambiente.
 
 **English version:** [README.en.md](README.en.md)
 
@@ -21,6 +21,7 @@ Userscript v1.2.0 para reduzir a unicidade do fingerprint do navegador com ruíd
 - [Analogia](#analogia)
 - [Recursos](#recursos)
 - [Instalação](#instalação)
+- [Exclusão por domínio](#exclusão-por-domínio)
 - [Teste rápido](#teste-rápido)
 - [Canvas — Antes e Depois](#canvas--antes-e-depois)
 - [Metadata sugerido](#metadata-sugerido)
@@ -85,6 +86,7 @@ O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você c
 - Sem listas hardcoded de hardware, plugins, conexão ou vozes inventadas
 - Wrappers com proteção contra aplicação duplicada e menor exposição via `Function.prototype.toString`
 - Menu de configuração com ativação e desativação de patches
+- Exclusão por domínio para desativar o script em sites específicos sem recarregar configurações
 - Compatibilidade com gerenciadores como Tampermonkey e similares
 
 ## Instalação
@@ -100,6 +102,17 @@ Passos manuais:
 3. Abra o arquivo `low-profile-fingerprint.user.js`.
 4. Instale o script pelo gerenciador.
 5. Recarregue as páginas em que deseja testar o comportamento.
+
+## Exclusão por domínio
+
+Se algum site quebrar com os patches ativos, você pode desativar o script apenas naquele domínio sem desinstalá-lo:
+
+1. Abra o site afetado.
+2. No menu do gerenciador de userscripts, escolha **Low-Profile Fingerprint: Desativar neste site**.
+3. Recarregue a página. O script passa a ignorar o domínio (e seus subdomínios) e não aplica nenhum patch.
+4. Para voltar a proteger o site, use **Low-Profile Fingerprint: Ativar neste site** e recarregue.
+
+A lista de exclusões é persistida pelo gerenciador via `GM_setValue`, então permanece entre sessões.
 
 ## Teste rápido
 
@@ -152,7 +165,7 @@ Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) compar
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.2.0
+// @version      1.3.0
 // @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
@@ -194,7 +207,6 @@ Se quiser contribuir, você pode:
 
 ## Roadmap
 
-- Adicionar exclusões por domínio
 - Criar modo balanceado e modo estrito
 - Melhorar documentação técnica de cada patch
 - Publicar versão instalável por release

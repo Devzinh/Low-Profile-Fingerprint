@@ -9,7 +9,7 @@
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
-Userscript v1.2.0 that reduces browser fingerprint uniqueness with lightweight per-session noise and defensive normalization based on real environment data.
+Userscript v1.3.0 that reduces browser fingerprint uniqueness with lightweight per-session noise and defensive normalization based on real environment data.
 
 **Portuguese version:** [README.md](README.md)
 
@@ -21,6 +21,7 @@ Userscript v1.2.0 that reduces browser fingerprint uniqueness with lightweight p
 - [Analogy](#analogy)
 - [Features](#features)
 - [Installation](#installation)
+- [Per-domain exclusion](#per-domain-exclusion)
 - [Quick test](#quick-test)
 - [Canvas — Before and After](#canvas--before-and-after)
 - [Suggested metadata](#suggested-metadata)
@@ -85,6 +86,7 @@ Imagine visiting a website as entering a mall where a security guard tries to re
 - No hardcoded lists of invented hardware, plugins, connection data, or voices
 - Wrappers protected against duplicate application with reduced exposure through `Function.prototype.toString`
 - Configuration menu for enabling and disabling patches
+- Per-domain exclusion to disable the script on specific sites without changing other settings
 - Compatibility with userscript managers such as Tampermonkey
 
 ## Installation
@@ -100,6 +102,17 @@ Manual steps:
 3. Open the `low-profile-fingerprint.user.js` file.
 4. Install the script through your userscript manager.
 5. Reload the pages where you want to test its behavior.
+
+## Per-domain exclusion
+
+If a site breaks while the patches are active, you can disable the script for that domain only, without uninstalling it:
+
+1. Open the affected site.
+2. In the userscript manager menu, choose **Low-Profile Fingerprint: Desativar neste site** (disable on this site).
+3. Reload the page. The script now skips that domain (and its subdomains) and applies no patches.
+4. To protect the site again, use **Low-Profile Fingerprint: Ativar neste site** (enable on this site) and reload.
+
+The exclusion list is persisted by the manager through `GM_setValue`, so it survives across sessions.
 
 ## Quick test
 
@@ -152,7 +165,7 @@ Test performed on [BrowserLeaks Canvas](https://browserleaks.com/canvas) compari
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.2.0
+// @version      1.3.0
 // @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
@@ -194,7 +207,6 @@ If you want to contribute, you can:
 
 ## Roadmap
 
-- Add domain exclusions
 - Create balanced mode and strict mode
 - Improve technical documentation for each patch
 - Publish installable releases
