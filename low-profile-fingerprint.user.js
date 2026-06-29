@@ -1,8 +1,8 @@
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.4.0
-// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
+// @version      1.5.0
+// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint (incluindo Client Hints e WebGPU) e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
@@ -21,7 +21,7 @@
   'use strict';
 
   const SCRIPT_NAME = 'Low-Profile Fingerprint';
-  const SCRIPT_VERSION = '1.4.0';
+  const SCRIPT_VERSION = '1.5.0';
   const root = typeof unsafeWindow === 'object' && unsafeWindow ? unsafeWindow : window;
   const mark = typeof Symbol === 'function' ? Symbol.for('lowProfileFingerprint.wrapped') : '__lowProfileFingerprintWrapped__';
   const nativeSource = typeof WeakMap === 'function' ? new WeakMap() : null;
@@ -40,6 +40,8 @@
     webgl: true,
     webglPixels: true,
     audio: true,
+    clientHints: true,
+    webgpu: true,
   });
   const labels = Object.freeze({
     screen: 'Screen',
@@ -54,6 +56,8 @@
     webgl: 'WebGL',
     webglPixels: 'WebGL pixel buffer',
     audio: 'Audio',
+    clientHints: 'Client Hints',
+    webgpu: 'WebGPU',
   });
   // v1.4.0: privacy modes scale entropy reduction and noise intensity in one place.
   const MODES = Object.freeze({
@@ -96,6 +100,8 @@
       ['webgl', patchWebGL],
       ['webglPixels', patchWebGLPixels],
       ['audio', patchAudio],
+      ['clientHints', patchClientHints],
+      ['webgpu', patchWebGPU],
     ].forEach(([key, patch]) => {
       if (!settings[key]) return;
       try {
@@ -151,6 +157,10 @@
       getFloatFrequencyData: win.AnalyserNode && win.AnalyserNode.prototype && win.AnalyserNode.prototype.getFloatFrequencyData,
       createElement: win.document && win.document.createElement.bind(win.document),
       supportedValuesOf: win.Intl && typeof win.Intl.supportedValuesOf === 'function' ? win.Intl.supportedValuesOf.bind(win.Intl) : null,
+      uaData: win.NavigatorUAData && win.NavigatorUAData.prototype,
+      getHighEntropyValues: win.NavigatorUAData && win.NavigatorUAData.prototype && win.NavigatorUAData.prototype.getHighEntropyValues,
+      gpuAdapter: win.GPUAdapter && win.GPUAdapter.prototype,
+      gpuAdapterInfo: win.GPUAdapterInfo && win.GPUAdapterInfo.prototype,
     };
   }
 
@@ -943,18 +953,34 @@
     });
   }
 
+  // v1.5.0: emulate the sparse, zero-mean ±1 LSB anomalies left by GPU floating-point
+  // rounding instead of applying a constant per-channel offset. A uniform bias is trivial
+  // to detect statistically (it shifts the whole histogram), so trackers can flag the
+  // canvas as tampered; rounding-like noise stays plausible while still breaking the hash.
+  function roundingDelta(rand, bias) {
+    const magnitudeRoll = rand();
+    let magnitude;
+    if (magnitudeRoll < 0.62) magnitude = 0;
+    else if (magnitudeRoll < 0.9) magnitude = 1;
+    else magnitude = randInt(rand, 1, Math.max(1, cfg.canvasMax));
+    if (magnitude === 0) return 0;
+    // Nudge the sign by the session bias so cross-session signatures still diverge,
+    // while keeping the per-channel mean close to zero.
+    const sign = rand() + (bias > 0 ? 0.06 : bias < 0 ? -0.06 : 0) < 0.5 ? -1 : 1;
+    return sign * magnitude;
+  }
+
   function noiseImageData(imageData, salt) {
     if (!imageData || !imageData.data || imageData.data.length < 4) return imageData;
     const data = imageData.data;
     const pixels = Math.floor(data.length / 4);
     const step = Math.max(1, Math.floor(pixels / cfg.canvasSamples));
     const rand = rng(session.seed + '|canvas|' + salt + '|' + pixels);
-    const jitter = randInt(rand, -1, 1);
     for (let pixel = 0; pixel < pixels; pixel += step) {
       const i = pixel * 4;
-      data[i] = clamp(data[i] + session.canvasShift[0] + jitter, 0, 255);
-      data[i + 1] = clamp(data[i + 1] + session.canvasShift[1] - jitter, 0, 255);
-      data[i + 2] = clamp(data[i + 2] + session.canvasShift[2], 0, 255);
+      data[i] = clamp(data[i] + roundingDelta(rand, session.canvasShift[0]), 0, 255);
+      data[i + 1] = clamp(data[i + 1] + roundingDelta(rand, session.canvasShift[1]), 0, 255);
+      data[i + 2] = clamp(data[i + 2] + roundingDelta(rand, session.canvasShift[2]), 0, 255);
     }
     return imageData;
   }
@@ -1189,6 +1215,82 @@
         const result = original.apply(this, args);
         typedNoise(args[0], session.seed + '|analyser', 0.0001 * cfg.audioScale, 128);
         return result;
+      });
+    }
+  }
+
+  // v1.5.0: keep only the major component of a dotted version string, zeroing the rest
+  // and preserving the original segment count so the value still looks well-formed.
+  function reduceVersion(value) {
+    const text = String(value == null ? '' : value);
+    const parts = text.split('.');
+    if (parts.length < 2 || !/^\d+$/.test(parts[0])) return text;
+    return [parts[0]].concat(parts.slice(1).map(() => '0')).join('.');
+  }
+
+  // v1.5.0: trim the high-entropy fields returned by NavigatorUAData.getHighEntropyValues.
+  // Brand/major signals stay intact (so the browser still looks coherent), but the build
+  // numbers and device model that uniquely identify a machine are collapsed.
+  function normalizeHighEntropy(values) {
+    if (!values || typeof values !== 'object') return values;
+    const out = {};
+    Object.keys(values).forEach((field) => { out[field] = values[field]; });
+    if (typeof out.platformVersion === 'string') out.platformVersion = reduceVersion(out.platformVersion);
+    if (typeof out.uaFullVersion === 'string') out.uaFullVersion = reduceVersion(out.uaFullVersion);
+    if (typeof out.model === 'string' && out.model) out.model = '';
+    if (Array.isArray(out.fullVersionList)) {
+      out.fullVersionList = out.fullVersionList.map((item) => (item && typeof item === 'object'
+        ? { brand: item.brand, version: reduceVersion(item.version) }
+        : item));
+    }
+    return out;
+  }
+
+  // v1.5.0: with User-Agent strings being frozen in favour of Client Hints, normalize the
+  // structured navigator.userAgentData high-entropy values that trackers increasingly read.
+  function patchClientHints() {
+    const nav = root.navigator;
+    if (!nav || !nav.userAgentData) return;
+    const proto = Native.uaData || Object.getPrototypeOf(nav.userAgentData);
+    if (!proto || typeof proto.getHighEntropyValues !== 'function') return;
+    wrap(proto, 'getHighEntropyValues', (original) => function getHighEntropyValues(...args) {
+      const result = original.apply(this, args);
+      if (result && typeof result.then === 'function') {
+        return result.then((values) => {
+          try { return normalizeHighEntropy(values); } catch (error) { reportIssue('clientHints:normalize', error); return values; }
+        });
+      }
+      try { return normalizeHighEntropy(result); } catch (error) { reportIssue('clientHints:normalize', error); return result; }
+    });
+  }
+
+  // v1.5.0: as graphics fingerprinting migrates from WebGL to GPUAdapter probing, blank the
+  // highest-entropy adapter descriptors (device and free-form description) while keeping the
+  // coarse vendor/architecture coherent, mirroring the WebGL renderer normalization.
+  function patchWebGPU() {
+    const gpu = root.navigator && root.navigator.gpu;
+    if (!gpu) return;
+    const infoProto = Native.gpuAdapterInfo || (root.GPUAdapterInfo && root.GPUAdapterInfo.prototype);
+    if (infoProto) {
+      defineGetter(infoProto, 'device', () => '');
+      defineGetter(infoProto, 'description', () => '');
+    }
+    const adapterProto = Native.gpuAdapter || (root.GPUAdapter && root.GPUAdapter.prototype);
+    if (adapterProto && typeof adapterProto.requestAdapterInfo === 'function') {
+      wrap(adapterProto, 'requestAdapterInfo', (original) => function requestAdapterInfo(...args) {
+        const result = original.apply(this, args);
+        const sanitize = (info) => {
+          if (!info || typeof Proxy !== 'function') return info;
+          return new Proxy(info, {
+            get(obj, prop) {
+              if (prop === 'device') return '';
+              if (prop === 'description') return '';
+              const value = Reflect.get(obj, prop, obj);
+              return typeof value === 'function' ? value.bind(obj) : value;
+            },
+          });
+        };
+        return result && typeof result.then === 'function' ? result.then(sanitize) : sanitize(result);
       });
     }
   }
