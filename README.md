@@ -9,7 +9,7 @@
   <img src="assets/Fingerprint Banner.png" alt="Low-Profile-Fingerprint userscript banner" width="640">
 </p>
 
-Userscript v1.4.0 para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva baseada em dados reais do ambiente.
+Userscript v1.5.0 para reduzir a unicidade do fingerprint do navegador com ruído leve por sessão e normalização defensiva baseada em dados reais do ambiente.
 
 **English version:** [README.en.md](README.en.md)
 
@@ -56,6 +56,8 @@ Entre os sinais tratados pelo script estão:
 - `speechSynthesis` (normalização da lista de vozes)
 - `battery` (fachada para propriedades da Battery API)
 - `WebGL` (vendor, renderer, parâmetros selecionados e `readPixels`)
+- `Client Hints` (`navigator.userAgentData.getHighEntropyValues`) com normalização de versões e modelo
+- `WebGPU` (`GPUAdapterInfo` via `adapter.info` e `requestAdapterInfo`)
 
 Esse tipo de abordagem segue a lógica de anti-fingerprinting por normalização e ruído leve: reduzir a estabilidade e a singularidade de sinais expostos sem tornar o navegador obviamente falso ou incoerente.
 
@@ -65,7 +67,7 @@ Desde a v1.2.0, o script evita perfis inventados: sinais como WebGL, conexão, p
 
 | API / Recurso | Método Utilizado | Objetivo de Privacidade |
 | :--- | :--- | :--- |
-| **Canvas 2D** | Injeção de Ruído Dinâmico | Altera levemente o canal de pixels para gerar hashes de assinatura sempre diferentes por sessão. |
+| **Canvas 2D** | Ruído de Arredondamento Esparso | Aplica variações de ±1 LSB esparsas e de média próxima de zero, imitando anomalias naturais de arredondamento de ponto flutuante de GPU em vez de um deslocamento constante (mais difícil de sinalizar estatisticamente como manipulado). |
 | **WebGL** | Normalização de Valores Reais & Ruído | Lê `VENDOR` e `RENDERER` reais via WebGL padrão, normaliza/trunca as strings e insere ruído em capturas de pixel buffer via `readPixels`. |
 | **Screen & Window** | Bucketing Coerente | Bucketiza dimensões reais de tela e deriva a área disponível dos valores reais normalizados. |
 | **Navigator plugins / mimeTypes** | Redução de Entropia Real | Usa apenas entradas reais do navegador, com normalização, deduplicação e ordenação determinística. |
@@ -74,6 +76,8 @@ Desde a v1.2.0, o script evita perfis inventados: sinais como WebGL, conexão, p
 | **Audio / Fonts** | Ruído em Medições | Adiciona microvariações em leituras de fontes e saídas de áudio sem distorcer o funcionamento. |
 | **Battery** | Fachada Defensiva | Reduz telemetria variável da Battery API para valores menos identificáveis. |
 | **Connection** | Bucketing de Valores Reais | Bucketiza `rtt` e `downlink` reais e preserva `type`/`effectiveType` reais quando a API existe. |
+| **Client Hints** | Redução de Entropia em `getHighEntropyValues` | Mantém marca e versão major coerentes, mas colapsa os números de build (`platformVersion`, `uaFullVersion`, `fullVersionList`) e zera o `model` do dispositivo. |
+| **WebGPU** | Normalização de `GPUAdapterInfo` | Zera os descritores de maior entropia (`device` e `description`) do adaptador, preservando `vendor`/`architecture` coerentes, tanto em `adapter.info` quanto em `requestAdapterInfo()`. |
 
 ## Analogia
 
@@ -85,7 +89,8 @@ O **Low-Profile-Fingerprint** funciona como um disfarce leve e coerente. Você c
 
 - Execução antecipada com `@run-at document-start`
 - Ruído leve e consistente por sessão
-- Normalização defensiva de múltiplas APIs do navegador
+- Ruído de canvas com aparência de arredondamento de ponto flutuante (média próxima de zero) em vez de deslocamento constante
+- Normalização defensiva de múltiplas APIs do navegador, incluindo Client Hints e WebGPU
 - Sem listas hardcoded de hardware, plugins, conexão ou vozes inventadas
 - Wrappers com proteção contra aplicação duplicada e menor exposição via `Function.prototype.toString`
 - Menu de configuração com ativação e desativação de patches
@@ -184,8 +189,8 @@ Teste realizado no [BrowserLeaks Canvas](https://browserleaks.com/canvas) compar
 // ==UserScript==
 // @name         Low-Profile-Fingerprint
 // @namespace    https://github.com/Devzinh/Low-Profile-Fingerprint
-// @version      1.4.0
-// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
+// @version      1.5.0
+// @description  Disfarça seu navegador: normaliza sinais comuns de fingerprint (incluindo Client Hints e WebGPU) e adiciona ruído leve por sessão para reduzir rastreamento sem quebrar sites.
 // @author       Rony Gabriel
 // @homepageURL  https://github.com/Devzinh/Low-Profile-Fingerprint
 // @supportURL   https://github.com/Devzinh/Low-Profile-Fingerprint/issues
